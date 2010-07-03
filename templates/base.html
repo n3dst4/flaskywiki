@@ -1,0 +1,11 @@
+{% extends "html.html" %}
+
+{% block pagebody %}
+<h1>{{self.title()|e}}</h1>
+{% block body %}{% endblock %}
+<a href="/">Home</a>
+{% endblock pagebody %}
+
+{% block title -%}
+Boggo Wiki
+{%- endblock title %}

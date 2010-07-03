@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block body %}
+    {% if pages %}
+        <ul>
+            {% for page in pages %}
+                <li><a href="/view/{{page.name}}">{{page.name}}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>There are no pages yet.</p>
+    {% endif %}
+    
+    <h2>Tags</h2>
+    {% for tag in tags %}
+        <a href="/tag/{{tag}}">{{tag}}</a>,
+    {% endfor %}
+    
+    <h2>Create a page</h2>
+    <form action="/edit">
+        <input name="name"/>
+        <input type="submit" value="Create"/>
+    </form>
+{% endblock body %}
+

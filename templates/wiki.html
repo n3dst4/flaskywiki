@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+
+{% block body %}
+    {{content|safe}}
+    <p>
+        Tags:
+        {% if not tags %}
+            <em>No tags</em>
+        {% else %}
+            {% for tag in tags %}
+                <a href="/tag/{{tag}}">{{tag}}</a>,
+            {% endfor %}
+        {% endif %}
+    </p>
+
+    {% if rev == -1 %}
+        <p>
+            <a href="/edit/{{name}}">Edit</a>
+        </p>
+    {% endif %}
+    <p>
+        History:
+        {% if rev == -1 %}
+            <em>Latest</em>,
+        {% else %}
+            <a href="/view/{{name}}">Latest</a>,
+        {% endif %}
+        {% for v in versions %}
+            {% if v == rev %}
+                <em>{{v}}</em>
+            {% else %}
+                <a href="/view/{{name}}?rev={{v}}">{{v}}</a>,
+            {% endif %}
+        {% endfor %}
+    </p>
+{% endblock %}
+    
+{% block title -%}
+{{title}}
+{% endblock %}

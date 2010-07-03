@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block body -%}
+    <form action="/edit/{{name}}" method="POST">
+        <label for="title">Title</label><br/>
+        <input name="title" size="60" value="{{title|e}}"><br/>
+            
+        <label for="markdown">Content</label><br/>
+        <textarea name="markdown" rows="20" cols="80">{{markdown|e}}</textarea>
+        <br/>
+        
+        <label for="tags">Tags</label><br/>
+        <input name="tags" size="60" value="{{ tags if tags is defined else "" |e}}"><br/>
+        <input type="submit" value="Save">
+    </form>
+{%- endblock body %}
+
+{% block title -%}
+    {% if name %}
+        Editing: {{name}}
+    {% else %}
+        Editing new page
+    {% endif %}
+{%- endblock title %}

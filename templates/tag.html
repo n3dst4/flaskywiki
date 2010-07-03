@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block body %}
+    {% if not pages %}
+        <p><em>No pages use this tag</em></p>
+    {% else %}
+        <ul>
+        {% for page in pages %}
+            <li><a href="/view/{{page}}">{{page}}</a></li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{%- endblock %}
+
+{% block title -%}
+Pages tagged with: {{tag}}
+{%- endblock %}
