@@ -1,23 +1,26 @@
 {% extends "base.html" %}
 
 {% block body %}
+
     {% if pages %}
+        <h2>Last page updates</h2>
         <ul>
             {% for page in pages %}
-                <li><a href="/view/{{page.name}}">{{page.name}}</a></li>
+                <li>
+                    <a href="{{ url_for("view", name=page.name) }}">{{page.name}}</a>,
+                    "{{page.latest_version.title}}"
+                </li>
             {% endfor %}
-        </ul>
-    {% else %}
-        <p>There are no pages yet.</p>
+        </ul>        
     {% endif %}
-    
+
     <h2>Tags</h2>
     {% for tag in tags %}
-        <a href="/tag/{{tag}}">{{tag}}</a>,
+        <a href="{{ url_for("tag", name=tag) }}">{{tag}}</a>,
     {% endfor %}
     
     <h2>Create a page</h2>
-    <form action="/edit">
+    <form action="{{ url_for("edit") }}">
         <input name="name"/>
         <input type="submit" value="Create"/>
     </form>

@@ -9,28 +9,28 @@
             <em>No tags</em>
         {% else %}
             {% for tag in tags %}
-                <a href="/tag/{{tag}}">{{tag}}</a>,
+                <a href="{{ url_for("tag", name=tag) }}">{{tag}}</a>,
             {% endfor %}
         {% endif %}
     </p>
 
-    {% if rev == -1 %}
+    {% if rev == 0 %}
         <p>
-            <a href="/edit/{{name}}">Edit</a>
+            <a href="{{ url_for("edit", name=name) }}">Edit</a>
         </p>
     {% endif %}
     <p>
         History:
-        {% if rev == -1 %}
+        {% if rev == 0 %}
             <em>Latest</em>,
         {% else %}
-            <a href="/view/{{name}}">Latest</a>,
+            <a href="{{ url_for("view", name=name) }}">Latest</a>,
         {% endif %}
-        {% for v in versions %}
-            {% if v == rev %}
-                <em>{{v}}</em>
+        {% for v in range(version_count-1, 0 , -1) %}
+            {% if version_count-v == rev %}
+                <em>{{v}}</em>,
             {% else %}
-                <a href="/view/{{name}}?rev={{v}}">{{v}}</a>,
+                <a href="/view/{{name}}?rev={{version_count-v}}">{{v}}</a>,
             {% endif %}
         {% endfor %}
     </p>

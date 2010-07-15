@@ -3,9 +3,5 @@
 {% block pagebody %}
 <h1>{{self.title()|e}}</h1>
 {% block body %}{% endblock %}
-<a href="/">Home</a>
+<a href="{{ url_for("index") }}">Home</a>
 {% endblock pagebody %}
-
-{% block title -%}
-Boggo Wiki
-{%- endblock title %}

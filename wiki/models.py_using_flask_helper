@@ -1,0 +1,86 @@
+#from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, Index
+#from sqlalchemy import create_engine
+#from sqlalchemy.orm import mapper, sessionmaker, relation, backref, deferred,\
+#                           undefer_group, column_property, validates, scoped_session
+#from sqlalchemy.sql import func
+#from contextlib import contextmanager
+from wiki import db
+
+
+#engine = create_engine('sqlite:///flask_sqla_wiki.sqlite', echo=True)
+#metadata = MetaData()
+
+#session = Session = scoped_session(sessionmaker(bind=engine, autocommit=False))
+
+
+
+#page_name_idx = db.Index("page_name", pages_table.c.name);
+
+#version_page_id_idx = db.Index("version_page_id", versions_table.c.page_id);
+
+#tag_name_idx = db.Index("tag_name", tags_table.c.name);
+
+
+pages_tags_table = db.Table("pages_tags", db.Model.metadata,
+    db.Column("page_id", db.Integer, db.ForeignKey("pages.id"), primary_key=True),
+    db.Column("tag_id", db.Integer, db.ForeignKey("tags.id"), primary_key=True)
+)
+
+
+
+
+#db.create_all()
+
+
+class Version(db.Model):
+    __tablename__ = "versions"
+    rev = db.Column(db.Integer, primary_key=True)
+    page_id = db.Column(db.Integer, db.ForeignKey("pages.id"), nullable=False)
+    title = db.deferred(db.Column(db.String, nullable=False))
+    content = db.deferred(db.Column(db.String, nullable=False))
+    
+    def __init__(self, title, content):
+        self.title = title
+        self.content = content
+
+
+class Tag(db.Model):
+    __tablename__ = "tags"
+    id = db.Column("id", db.Integer, primary_key=True)
+    name = db.Column("name", db.String, nullable=False, unique=True)
+
+    def __init__(self, name): self.name = name
+
+    @staticmethod
+    def all():
+        tags = Tag.query.filter(Tag.pages.any()) # don't need .all() here?
+        return [tag.name for tag in tags]
+
+    @db.validates("name")
+    def validate_name(self, key, name):
+        assert name == name.lower()
+        return name
+
+
+class Page(db.Model):
+    __tablename__ = "pages"
+    id = db.Column("id", db.Integer, primary_key=True)
+    name = db.Column("name", db.String, nullable=False, unique=True)
+    versions = db.relation(Version, backref="page", order_by=Version.rev.desc)
+    tags = db.relation(Tag, secondary=pages_tags_table, backref="pages", lazy=False)
+
+    
+    def __init__(self, name): self.name = name
+    def __repr__(self): return "<Page('%s')>" % (self.name)
+    def tag_list(self): return [tag.name for tag in self.tags]
+    def _get_tag_string(self): return ", ".join(self.tag_list())
+    def _set_tag_string(self, string):
+        tags = set((tag.strip(" ").lower() for tag in string.split(",")))
+        if "" in tags: tags.remove("")
+        existing_tags = Tag.query.filter(Tag.name.in_(tags)).all() # need .all() here?
+        for tag in existing_tags: tags.remove(tag.name)
+        for tag in tags: existing_tags.append(Tag(tag))
+        self.tags = existing_tags
+    tag_string = property(_get_tag_string, _set_tag_string)
+
+

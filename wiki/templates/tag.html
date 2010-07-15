@@ -6,7 +6,7 @@
     {% else %}
         <ul>
         {% for page in pages %}
-            <li><a href="/view/{{page}}">{{page}}</a></li>
+            <li><a href="{{ url_for("view", name=page) }}">{{page}}</a></li>
         {% endfor %}
         </ul>
     {% endif %}
