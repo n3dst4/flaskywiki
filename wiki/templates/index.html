@@ -8,7 +8,7 @@
             {% for page in pages %}
                 <li>
                     <a href="{{ url_for("view", name=page.name) }}">{{page.name}}</a>,
-                    "{{page.latest_version.title}}"
+                    "{{page.latest_version.title}}" (rev {{page.latest_version.rev}})
                 </li>
             {% endfor %}
         </ul>        

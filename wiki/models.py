@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, Index
+from sqlalchemy import Table, Column, Integer, String, Text, Boolean, DateTime, MetaData, ForeignKey, Index
 from sqlalchemy import create_engine
 from sqlalchemy.orm import mapper, sessionmaker, relation, relationship, backref, deferred,\
                            undefer_group, column_property, validates, scoped_session
@@ -6,6 +6,9 @@ from sqlalchemy.sql import func, select
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta, synonym_for
 from contextlib import contextmanager
 from wiki import Base
+
+    
+
 
 
 #page_name_idx = Index("page_name", pages_table.c.name);
@@ -28,8 +31,9 @@ class Version(Base):
     __tablename__ = "versions"
     rev = Column(Integer, primary_key=True)
     page_id = Column(Integer, ForeignKey("pages.id"), nullable=False)
-    title = Column(String, nullable=False)
-    content = deferred(Column(String, nullable=False))
+    title = Column(String(1024), nullable=False)
+    content = deferred(Column(Text, nullable=False))
+    deleted = deferred(Column(Boolean, nullable=False, default=False))
     
     def __init__(self, title, content):
         self.title = title
@@ -39,8 +43,9 @@ class Version(Base):
 class Tag(Base):
     __tablename__ = "tags"
     id = Column("id", Integer, primary_key=True)
-    name = Column("name", String, nullable=False, unique=True)
-
+    name = Column("name", String(1000), nullable=False, unique=True)
+    deleted = deferred(Column(Boolean, nullable=False, default=False))
+    
     def __init__(self, name): self.name = name
 
     @staticmethod
@@ -54,15 +59,14 @@ class Tag(Base):
         return name
 
 
-
-
-
 class Page(Base):
     ##__tablename__ = "pages"
     __table__ = Table("pages", Base.metadata,
         Column("id", Integer, primary_key=True),
-        Column("name", String, nullable=False, unique=True)
+        Column("name", String(1000), nullable=False, unique=True),
+        Column("deleted", Boolean, nullable=False, default=False)
     )
+    deleted = deferred(__table__.c.deleted)
     versions = relation(Version, backref="page", order_by=Version.rev.desc)
     tags = relation(Tag, secondary=pages_tags_table, backref="pages", lazy="subquery")
 
@@ -101,6 +105,12 @@ class Page(Base):
     tag_string = property(_get_tag_string, _set_tag_string)
     
 
+class Post(Base):
+    __tablename__ = "posts"
+    id = Column(Integer, primary_key=True)
+    title = Column(String(1024), nullable=False)
+    date_posted = Column(DateTime)
+    content = Column(Text)
 
 
 
